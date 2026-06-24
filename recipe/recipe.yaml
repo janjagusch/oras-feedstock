@@ -1,6 +1,8 @@
+schema_version: 1
+
 context:
   name: oras
-  version: "1.2.3"
+  version: "1.3.2"
 
 package:
   name: ${{ name }}
@@ -8,7 +10,7 @@ package:
 
 source:
   url: https://github.com/oras-project/${{ name }}/archive/v${{ version }}.tar.gz
-  sha256: f08ddcccaedbb336e85942b6ccb9625c2a7e4e411d5909bd6f670eb0d7ab3977
+  sha256: 33a44023666e00b6e32b5bd022a77f0813a488bdeab90c7d728b811d5f97df48
 
 build:
   number: 0
@@ -19,13 +21,13 @@ build:
 
     - if: osx
       then:
-        - make build-mac
-        - mv bin/darwin/amd64/oras $PREFIX/bin/oras
+        - make build-mac-${{ "arm64" if target_platform == "osx-arm64" else "amd64" }}
+        - mv bin/darwin/${{ "arm64" if target_platform == "osx-arm64" else "amd64" }}/oras $PREFIX/bin/oras
 
     - if: linux
       then:
-        - make build-linux
-        - mv bin/linux/amd64/oras $PREFIX/bin/oras
+        - make build-linux-${{ "arm64" if target_platform == "linux-aarch64" else "amd64" }}
+        - mv bin/linux/${{ "arm64" if target_platform == "linux-aarch64" else "amd64" }}/oras $PREFIX/bin/oras
 
     - if: unix
       then:
@@ -37,7 +39,7 @@ build:
       then:
         - setlocal enableextensions
         - mkdir -p %PREFIX%\Library\bin
-        - make build-windows
+        - make build-windows-amd64
         - move bin\windows\amd64\oras.exe %PREFIX%\Library\bin\oras.exe
         - bash %RECIPE_DIR%\collect_licenses.sh
 
@@ -64,3 +66,4 @@ extra:
   recipe-maintainers:
     - borchero
     - wolfv
+    - janjagusch
